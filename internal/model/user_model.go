@@ -15,3 +15,13 @@ type UserRegisterRequestSchema struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type UserLoginRequestSchema struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type UserLoginResponseSchema struct {
+	Token     string `json:"token"`
+	TokenType string `json:"token_type"`
+}

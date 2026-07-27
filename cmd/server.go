@@ -6,6 +6,7 @@ import (
 	"latihan/internal/config"
 	"latihan/internal/database"
 	"latihan/internal/handler"
+	"latihan/internal/middleware"
 	"latihan/internal/repository"
 	"latihan/internal/service"
 	"log"
@@ -22,14 +23,16 @@ func RunServer() {
 	}
 
 	dbPool := config.GetDBPool()
+	rdb := config.GetRedisClient()
 
 	if err := database.RunMigrations(context.Background(), dbPool); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 
 	userRepo := repository.NewPostgresUserRepository(dbPool)
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, rdb)
 	userHandler := handler.NewUserService(userService)
+	authMiddleware := middleware.NewAuthMiddleware(userService)
 
 	mux := http.NewServeMux()
 
@@ -46,6 +49,9 @@ func RunServer() {
 	})
 
 	mux.HandleFunc("/api/v1/register", userHandler.Register)
+	mux.HandleFunc("/api/v1/login", userHandler.Login)
+
+	mux.HandleFunc("/api/v1/logout", authMiddleware.Authenticate(userHandler.Logout))
 
 	fmt.Println("Server is running on port :8080")
 	if err := http.ListenAndServe(":8080", mux); err != nil {

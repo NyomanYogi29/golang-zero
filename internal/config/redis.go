@@ -8,20 +8,26 @@ import (
 
 var (
 	Ctx = context.Background()
-	RDB *redis.Client
+	rdb *redis.Client
 )
 
 func ConnectRedis() error {
-	RDB = redis.NewClient(&redis.Options{
+	client := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "",
 		DB:       0,
 	})
 
-	_, err := RDB.Ping(Ctx).Result()
+	_, err := client.Ping(Ctx).Result()
 	if err != nil {
 		return err
 	}
 
+	rdb = client
+
 	return nil
+}
+
+func GetRedisClient() *redis.Client {
+	return rdb
 }
