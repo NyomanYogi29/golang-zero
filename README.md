@@ -1,4 +1,4 @@
-# latihan-go
+# go-practice
 
 My personal playground for learning Go. No framework, just the standard library, PostgreSQL, and Redis, structured the way I'd want a real backend to look. Well, soon I'll be using a framework but not now.
 
