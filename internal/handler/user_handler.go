@@ -16,6 +16,17 @@ func NewUserService(userService *service.UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
+// Register godoc
+// @Summary      Register a new user
+// @Description  Create a new user account with name, email, and password
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body model.UserRegisterRequestSchema true "Register payload"
+// @Success      201 {object} global.SuccessResponse{data=model.User}
+// @Failure      400 {object} global.ErrorResponse
+// @Failure      405 {object} global.ErrorResponse
+// @Router       /register [post]
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		res := global.NewErrorResponse("Method tidak diizinkan", "METHOD_NOT_ALLOWED")
@@ -43,6 +54,18 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 	global.WriteJSON(w, http.StatusCreated, res)
 }
 
+// Login godoc
+// @Summary      Login
+// @Description  Authenticate with email and password and receive a JWT access token
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request body model.UserLoginRequestSchema true "Login payload"
+// @Success      200 {object} global.SuccessResponse{data=model.UserLoginResponseSchema}
+// @Failure      400 {object} global.ErrorResponse
+// @Failure      401 {object} global.ErrorResponse
+// @Failure      405 {object} global.ErrorResponse
+// @Router       /login [post]
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		res := global.NewErrorResponse("Method is not allowed", "METHOD_NOT_ALLOWED")
@@ -68,6 +91,16 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	global.WriteJSON(w, http.StatusOK, res)
 }
 
+// Logout godoc
+// @Summary      Logout
+// @Description  Invalidate the current session for the authenticated user
+// @Tags         auth
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {object} global.GlobalResponse
+// @Failure      401 {object} global.ErrorResponse
+// @Failure      500 {object} global.ErrorResponse
+// @Router       /logout [post]
 func (h *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value("user_id").(string)
 	if !ok {

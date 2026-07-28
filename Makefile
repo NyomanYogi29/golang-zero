@@ -10,8 +10,15 @@ docker-up:
 docker-down:
 	docker-compose down
 
-build:
+swagger:
+	swag init -g cmd/server.go -o docs
+
+build: swagger
 	go build -o ./bin/server ./cmd/server.go
+
+tools:
+	go install github.com/air-verse/air@latest
+	go install github.com/swaggo/swag/cmd/swag@latest
 
 push:
 	@if [ -z "$(m)" ]; then \

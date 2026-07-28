@@ -13,8 +13,23 @@ import (
 	"net/http"
 	"os"
 
+	_ "latihan/docs"
+
+	httpSwagger "github.com/swaggo/http-swagger"
+
 	"github.com/joho/godotenv"
 )
+
+// @title Go-Playground API Documentation
+// @version 1.0
+// @description This is the main entry point of the server
+// @host localhost:8080
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and the JWT token.
 
 func RunServer() {
 	if err := godotenv.Load(); err != nil {
@@ -43,8 +58,11 @@ func RunServer() {
 
 	mux := http.NewServeMux()
 
+	mux.HandleFunc("/swagger/", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
+
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		// Tangani jika ada path aneh yang tidak terdaftar
 		if r.URL.Path != "/" {
 			http.NotFound(w, r)
 			return

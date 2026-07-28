@@ -1,0 +1,178 @@
+basePath: /api/v1
+definitions:
+  global.ErrorDetail:
+    properties:
+      code:
+        type: string
+    type: object
+  global.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/global.ErrorDetail'
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  global.GlobalResponse:
+    properties:
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  global.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  model.User:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  model.UserLoginRequestSchema:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  model.UserLoginResponseSchema:
+    properties:
+      token:
+        type: string
+      token_type:
+        type: string
+    type: object
+  model.UserRegisterRequestSchema:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is the main entry point of the server
+  title: Go-Playground API Documentation
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate with email and password and receive a JWT access token
+      parameters:
+      - description: Login payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserLoginRequestSchema'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/global.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.UserLoginResponseSchema'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/global.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/global.ErrorResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/global.ErrorResponse'
+      summary: Login
+      tags:
+      - auth
+  /logout:
+    post:
+      description: Invalidate the current session for the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/global.GlobalResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/global.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/global.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Logout
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user account with name, email, and password
+      parameters:
+      - description: Register payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserRegisterRequestSchema'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            allOf:
+            - $ref: '#/definitions/global.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.User'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/global.ErrorResponse'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/global.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and the JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

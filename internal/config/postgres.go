@@ -11,7 +11,7 @@ import (
 var dbPool *pgxpool.Pool
 
 func ConnectPostgres() error {
-	connectionString := os.Getenv("DATABASE_UTL")
+	connectionString := os.Getenv("DATABASE_URL")
 	if connectionString == "" {
 		connectionString = "postgres://postgres:password@localhost:5432/app_db?sslmode=disable"
 	}
