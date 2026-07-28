@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -10,9 +11,12 @@ import (
 var dbPool *pgxpool.Pool
 
 func ConnectPostgres() error {
-	dsn := "postgres://postgres:password@localhost:5432/app_db?sslmode=disable"
+	connectionString := os.Getenv("DATABASE_UTL")
+	if connectionString == "" {
+		connectionString = "postgres://postgres:password@localhost:5432/app_db?sslmode=disable"
+	}
 
-	config, err := pgxpool.ParseConfig(dsn)
+	config, err := pgxpool.ParseConfig(connectionString)
 	if err != nil {
 		return fmt.Errorf("gagal parse config postgres: %w", err)
 	}

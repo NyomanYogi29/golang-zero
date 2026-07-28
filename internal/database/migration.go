@@ -15,7 +15,7 @@ var allSchemas = []string{
 func RunMigrations(ctx context.Context, db *pgxpool.Pool) error {
 	tx, err := db.Begin(ctx)
 	if err != nil {
-		return fmt.Errorf("gagal memulai transaksi migrasi: %w", err)
+		return fmt.Errorf("Failed to starting migration: %w", err)
 	}
 
 	defer tx.Rollback(ctx)
@@ -24,12 +24,12 @@ func RunMigrations(ctx context.Context, db *pgxpool.Pool) error {
 
 	for idx, schema := range allSchemas {
 		if _, err := tx.Exec(ctx, schema); err != nil {
-			return fmt.Errorf("gagal migrasi skema urutan ke-%d: %w", idx+1, err)
+			return fmt.Errorf("Failed migrating schema on index: %d: %w", idx+1, err)
 		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("gagal commit migrasi: %w", err)
+		return fmt.Errorf("Failed to commit migration: %w", err)
 	}
 
 	log.Println("All database migrations completed successfully!")

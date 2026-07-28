@@ -11,9 +11,16 @@ import (
 	"latihan/internal/service"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func RunServer() {
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env file is not found. Fallback into default OS environment")
+	}
+
 	if err := config.ConnectPostgres(); err != nil {
 		log.Fatal(err)
 	}
@@ -45,7 +52,7 @@ func RunServer() {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"success": true, "message": "Server API berjalan dengan baik!"}`))
+		w.Write([]byte(`{"success": true, "message": "Gateway is running like a butter!"}`))
 	})
 
 	mux.HandleFunc("/api/v1/register", userHandler.Register)
@@ -53,8 +60,13 @@ func RunServer() {
 
 	mux.HandleFunc("/api/v1/logout", authMiddleware.Authenticate(userHandler.Logout))
 
-	fmt.Println("Server is running on port :8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	fmt.Printf("Server is running on port :%s\n", port)
+	if err := http.ListenAndServe(":"+port, mux); err != nil {
 		log.Fatal(err)
 	}
 
